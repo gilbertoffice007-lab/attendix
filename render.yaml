@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: attendix-api
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.4
+      - key: APP_ENV
+        value: production
+      # Paste the Neon pooled connection string, including sslmode=require.
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: true
+      - key: COOKIE_SAMESITE
+        value: none
+      - key: LOG_LEVEL
+        value: INFO
+      # Faculty self-signup. Set to false for invitation-only onboarding.
+      - key: ALLOW_PUBLIC_REGISTRATION
+        value: true
+      # Set this to your deployed frontend origin, e.g. https://attendix.vercel.app
+      - key: CORS_ORIGINS
+        sync: false
